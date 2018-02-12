@@ -431,7 +431,7 @@ Now that we know the general region of where the lanes are located, we can use t
 
 Using the collected (and imputed) lane line locations, we fit a line and retrieve the best fit second order polynomial values. Second order polynomial function:
 
-[Second Order Polynomial](media/formula_second_order_poly.png)
+![png](media/formula_second_order_poly.png)
 
 
 ```python
@@ -560,14 +560,14 @@ img_out,left_lane_fit,right_lane_fit,left_lane_fit_x,right_lane_fit_x,left_lane_
 
 ## Calculating radius of curvature
 1. In order to calculate the radius of curvature, we first need to find the 1st and 2nd derivatives of our second order polynomial function:
-![second_order_poly](media/formula_second_order_poly.png)
-![derivatives](media/formula_12derivatives.png)
+![png](media/formula_second_order_poly.png)
+![png](media/formula_12derivatives.png)
 
 2. We convert our pixel scale into real world coordinates using an appropriate meter to pixel ratio:
-![Pixel Conversion](media/formula_pixel_conversion.png)
+![png](media/formula_pixel_conversion.png)
 
 3. After calculating their respective derivatives, we estimate the radius of curvature for both left/right lane lines using our curvature formula:
-![R-Curve1](media/formula_rcurve1.png)
+![png](media/formula_rcurve1.png)
 
 
 ```python
