@@ -201,7 +201,7 @@ def gradient_threshold_pipeline(img,sobel_kernel=3,blur_kernel=5,color_thresh=(0
     return binary_out_white,binary_out_yellow,binary_out_s,binary_out_x,binary_out_y,binary_out_magnitude,binary_out_direction
 ```
 
-## Combine multiple thresholds to build a more reliable image
+## Combine multiple thresholds to build a binary image that's able to distinguish lane lines clearly
 We utilize a combination of color and gradient thresholds to develop a finalized image that accurately picks up lane line information.
 
 
