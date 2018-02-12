@@ -431,7 +431,7 @@ Now that we know the general region of where the lanes are located, we can use t
 
 Using the collected (and imputed) lane line locations, we fit a line and retrieve the best fit second order polynomial values. Second order polynomial function:
 
-![Second Order Polynomial](media/formula_second_order_poly.png)
+[Second Order Polynomial](media/formula_second_order_poly.png)
 
 
 ```python
