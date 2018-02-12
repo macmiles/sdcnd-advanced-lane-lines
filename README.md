@@ -430,6 +430,7 @@ initial_left_lane_x, initial_right_lane_x = initial_lane_detection(final_image_w
 Now that we know the general region of where the lanes are located, we can use this information to scan the location of the new lanes at the upcoming windows.
 
 Using the collected (and imputed) lane line locations, we fit a line and retrieve the best fit second order polynomial values. Second order polynomial function:
+
 ![Second Order Polynomial](media/formula_second_order_poly.png)
 
 
