@@ -121,7 +121,7 @@ plt.show()
 
 
 ```python
-test_img_road = mpimg.imread('./test_images/test5.jpg') # load test image
+test_img_road = mpimg.imread('./test_images/test3.jpg') # load test image
 test_img_road_undistorted = undistort_image(test_img_road) # undistort test image
 
 f,(ax1,ax2) = plt.subplots(1,2,figsize=(20,30))
@@ -201,7 +201,7 @@ def gradient_threshold_pipeline(img,sobel_kernel=3,blur_kernel=5,color_thresh=(0
     return binary_out_white,binary_out_yellow,binary_out_s,binary_out_x,binary_out_y,binary_out_magnitude,binary_out_direction
 ```
 
-## Combine multiple thresholds to build a binary image that's able to distinguish lane lines clearly
+## Combine multiple thresholds to build a more reliable image
 We utilize a combination of color and gradient thresholds to develop a finalized image that accurately picks up lane line information.
 
 
@@ -281,7 +281,7 @@ y = [y1,y2,y3,y4]
 labels = ['x1,y1','x2,y2','x3,y3','x4,y4']
 fig, ax = plt.subplots(figsize=(20,20))
 ax.imshow(final_image_binary,cmap='gray')
-ax.axis('off')
+# ax.axis('off')
 ax.plot(x,y,'o-',color='red')
 
 for i,label in enumerate(labels):
@@ -351,7 +351,7 @@ plt.imshow(final_image_warped,cmap='gray')
 
 
 
-    <matplotlib.image.AxesImage at 0x1221c643da0>
+    <matplotlib.image.AxesImage at 0x1695f4e7e48>
 
 
 
@@ -383,7 +383,7 @@ plt.imshow(final_image_warped_masked,cmap='gray')
 
 
 
-    <matplotlib.image.AxesImage at 0x1221bd049e8>
+    <matplotlib.image.AxesImage at 0x1695f4c1550>
 
 
 
@@ -419,7 +419,7 @@ def initial_lane_detection(img,plot=False):
 initial_left_lane_x, initial_right_lane_x = initial_lane_detection(final_image_warped_masked,plot=True)
 ```
 
-    Initial left lane max: 529, Initial right lane max: 756
+    Initial left lane max: 547, Initial right lane max: 759
     
 
 
@@ -430,7 +430,6 @@ initial_left_lane_x, initial_right_lane_x = initial_lane_detection(final_image_w
 Now that we know the general region of where the lanes are located, we can use this information to scan the location of the new lanes at the upcoming windows.
 
 Using the collected (and imputed) lane line locations, we fit a line and retrieve the best fit second order polynomial values. Second order polynomial function:
-
 ![png](media/formula_second_order_poly.png)
 
 
@@ -560,48 +559,51 @@ img_out,left_lane_fit,right_lane_fit,left_lane_fit_x,right_lane_fit_x,left_lane_
 
 ## Calculating radius of curvature
 1. In order to calculate the radius of curvature, we first need to find the 1st and 2nd derivatives of our second order polynomial function:
-
-![png](media/formula_second_order_poly.PNG)
-
-![png](media/formula_12derivatives.PNG)
+![png](media/formula_second_order_poly.png)
+![png](media/formula_12derivatives.png)
 
 2. We convert our pixel scale into real world coordinates using an appropriate meter to pixel ratio:
-
 ![png](media/formula_pixel_conversion.png)
 
 3. After calculating their respective derivatives, we estimate the radius of curvature for both left/right lane lines using our curvature formula:
-
-![png](media/formula_rcurve1.PNG)
+![png](media/formula_rcurve1.png)
 
 
 ```python
 def curvature(left_lane_x_list,right_lane_x_list,left_lane_y_list,right_lane_y_list):
 #     img_out = np.copy(img)
-    mpp_y = 30/720 # meters per pixel y
-    mpp_x = 8/1280 # meters per pixel x
-
+    mpp_y = 27/720 # meters per pixel y
+    mpp_x = 3.7/500 # meters per pixel x
+    y_value = np.max(y_plot)
+#     quadratic_coeff = 3e-4
+#     leftx = np.array([200 + (y**2)*quadratic_coeff + np.random.randint(-50, high=51) for y in ploty])
+#     rightx = np.array([900 + (y**2)*quadratic_coeff + np.random.randint(-50, high=51) for y in ploty])
+    
     left_lane_y = np.array(left_lane_y_list)
     left_lane_x = np.array(left_lane_x_list)
-    left_lane_fit_pixels = np.polyfit(left_lane_y*mpp_y,left_lane_x*mpp_x,2) # finds best fit
+    left_lane_fit = np.polyfit(left_lane_y*mpp_y,left_lane_x*mpp_x,2) # finds best fit
 
     right_lane_y = np.array(right_lane_y_list)
     right_lane_x = np.array(right_lane_x_list)
-    right_lane_fit_pixels = np.polyfit(right_lane_y*mpp_y,right_lane_x*mpp_x,2) # finds best fit
-    r_curve_left = ((1+(2*left_lane_fit_pixels[0]*y_plot*mpp_y+left_lane_fit_pixels[1])**2)**(1.5)/np.absolute(2*left_lane_fit_pixels[0]))
-    r_curve_right = ((1+((2*right_lane_fit_pixels[0]*y_plot)+right_lane_fit_pixels[1])**2)**(1.5)/np.absolute(2*right_lane_fit_pixels[0]))
+    right_lane_fit = np.polyfit(right_lane_y*mpp_y,right_lane_x*mpp_x,2) # finds best fit
+    r_curve_left = ((1+(2*left_lane_fit[0]*y_plot*mpp_y+left_lane_fit[1])**2)**1.5)/np.absolute(2*left_lane_fit[0])
+    r_curve_right = ((1+(2*right_lane_fit[0]*y_plot*mpp_y+right_lane_fit[1])**2)**1.5)/np.absolute(2*right_lane_fit[0])
     
-    r_curve_left_value = np.average(r_curve_left[:50]) # curve average
-    r_curve_right_value = np.average(r_curve_right[:50]) # curve average
-    return r_curve_left_value,r_curve_right_value
+    r_curve_left_value = np.average(r_curve_left) # curve average
+    r_curve_right_value = np.average(r_curve_right) # curve average
+    return r_curve_left_value,r_curve_right_value,left_lane_fit,right_lane_fit
 
-r_curve_left,r_curve_right = curvature(left_lane_x_list,right_lane_x_list,left_lane_y_list,right_lane_y_list)
-r_curve_left,r_curve_right
+r_curve_left,r_curve_right,left_lane_fit,right_lane_fit = curvature(left_lane_x_list,right_lane_x_list,left_lane_y_list,right_lane_y_list)
+r_curve_left,r_curve_right,left_lane_fit,right_lane_fit
 ```
 
 
 
 
-    (837.04086001553924, 1605.6345765172209)
+    (2365.8154827200647,
+     1227.3563743842933,
+     array([  2.11476909e-04,  -2.59391534e-02,   4.55704554e+00]),
+     array([  4.07437169e-04,  -1.83202571e-02,   5.81057086e+00]))
 
 
 
@@ -609,8 +611,9 @@ r_curve_left,r_curve_right
 
 
 ```python
-def plot_lane_mask(img_undistorted,img_warp,r_curve_left,r_curve_right,left_lane_fit_x,right_lane_fit_x,y_plot):
-    mpp_x = 7.5/1280 # meters per pixel x
+def plot_lane_mask(img_undistorted,img_warp,r_curve_left,r_curve_right,left_lane_fit_x,right_lane_fit_x,left_lane_fit,right_lane_fit,y_plot):
+#     mpp_x = 1/1280 # meters per pixel x
+    y_value = np.max(y_plot) # center offset is evaluated at this y location (towards the bottom of image)
     
     img_undistorted_out = np.copy(img_undistorted)
     img_warp_out = np.copy(img_warp)
@@ -622,13 +625,18 @@ def plot_lane_mask(img_undistorted,img_warp,r_curve_left,r_curve_right,left_lane
     lane_pts = np.hstack((left_lane_pts,right_lane_pts))
 
     # plot mask
-    image_shape = (img_out.shape[1],img_out.shape[0])
+    image_shape = (img_undistorted_out.shape[1],img_undistorted_out.shape[0])
     cv2.fillPoly(zero_rgb,np.int_([lane_pts]), (0,255,0))
     lane_overlay = cv2.warpPerspective(zero_rgb,M_inv,image_shape)
 
-    height,width = img_out.shape[:2]
+    height,width = img_undistorted_out.shape[:2]
     mid_x = width//2
-    center_position = ((left_lane_pts[0,0,0]+right_lane_pts[0,0,0])/2 - mid_x) * mpp_x
+    
+    left_lane_x = left_lane_fit[0]*y_value**2 + left_lane_fit[1]*y_value + left_lane_fit[2]
+    right_lane_x = right_lane_fit[0]*y_value**2 + right_lane_fit[1]*y_value + right_lane_fit[2]
+    
+#     center_position = ((left_lane_pts[0,0,0]+right_lane_pts[0,0,0])/2 - mid_x) * mpp_x
+    center_position = ((left_lane_x + right_lane_x)/2 - mid_x)/width/2
     if center_position > 0:
         direction = 'right'
     else:
@@ -636,16 +644,11 @@ def plot_lane_mask(img_undistorted,img_warp,r_curve_left,r_curve_right,left_lane
 
     r_curve_avg = (r_curve_left + r_curve_right)/2
     final_out = cv2.addWeighted(img_undistorted,1,lane_overlay,0.22,0)
-    if r_curve_avg < 15000:
-        cv2.putText(final_out,'Lane Curvature Radius: {:.2f}m'.format(r_curve_avg),(20,40),cv2.FONT_HERSHEY_COMPLEX,1,(255,255,255),2)
-    else:
-        cv2.putText(final_out,'Lane Curvature Radius: inf',(20,40),cv2.FONT_HERSHEY_COMPLEX,1,(255,255,255),2)
-#     cv2.putText(final_out,'Left Lane Curvature Radius: {:.2f}m'.format(r_curve_left),(20,40),cv2.FONT_HERSHEY_COMPLEX,1,(255,255,255),2)
-#     cv2.putText(final_out,'Right Lane Curvature Radius: {:.2f}m'.format(r_curve_right),(20,80),cv2.FONT_HERSHEY_COMPLEX,1,(255,255,255),2)
-    cv2.putText(final_out,'Center Offset: {:.4f}m {}'.format(np.abs(center_position),direction),(20,80),cv2.FONT_HERSHEY_COMPLEX,1,(255,255,255),2)
+    cv2.putText(final_out,'Lane Curvature Radius: {:.0f}m'.format(r_curve_avg),(20,40),cv2.FONT_HERSHEY_COMPLEX,1,(255,255,255),2)
+    cv2.putText(final_out,'Center Offset: {:.3f}m {}'.format(np.abs(center_position),direction),(20,80),cv2.FONT_HERSHEY_COMPLEX,1,(255,255,255),2)
     return final_out
 
-final_out = plot_lane_mask(test_img_road_undistorted,final_image_warped_masked,r_curve_left,r_curve_right,left_lane_fit_x,right_lane_fit_x,y_plot)
+final_out = plot_lane_mask(test_img_road_undistorted,final_image_warped_masked,r_curve_left,r_curve_right,left_lane_fit_x,right_lane_fit_x,left_lane_fit,right_lane_fit,y_plot)
 plt.figure(figsize=(20,20))
 plt.imshow(final_out)
 plt.axis('off')
@@ -780,11 +783,11 @@ def main_pipeline(img):
         right_line.detected = False
     
     # left/right curvature is calculated
-    r_curve_left,r_curve_right = curvature(left_lane_x_list,right_lane_x_list,left_lane_y_list,right_lane_y_list)
-    
+    r_curve_left,r_curve_right,left_lane_fit,right_lane_fit = curvature(left_lane_x_list,right_lane_x_list,left_lane_y_list,right_lane_y_list)
+
     left_line.recent_r_curve.append(r_curve_left)
     right_line.recent_r_curve.append(r_curve_right)
-    
+
     max_r_curve_data = 30
     if len(left_line.recent_r_curve) > max_r_curve_data:
         left_line.recent_r_curve = left_line.recent_r_curve[-max_r_curve_data:]
@@ -799,7 +802,7 @@ def main_pipeline(img):
         right_r_curve_avg = np.average(right_line.recent_r_curve)
     
     # plot lane mask and text
-    final_out = plot_lane_mask(img_undistorted,final_image_warped_masked,left_r_curve_avg,right_r_curve_avg,left_lane_fit_x,right_lane_fit_x,y_plot)
+    final_out = plot_lane_mask(img_undistorted,final_image_warped_masked,r_curve_left,r_curve_right,left_lane_fit_x,right_lane_fit_x,left_lane_fit,right_lane_fit,y_plot)
     return final_out
 ```
 
@@ -822,7 +825,7 @@ chess_image_paths = glob.glob('./camera_cal/calibration*.jpg')
 # retrieve camera calibration values using our custom camera_calibration function
 chess_images, ret, mtx, dist, rvecs, tvecs = camera_calibration(chess_image_paths)
 
-output_video_title = 'challenge_video_out.mp4'
+output_video_title = 'project_video_out.mp4'
 clip1 = VideoFileClip('project_video.mp4')
 output_video = clip1.fl_image(main_pipeline)
 %time output_video.write_videofile(output_video_title, audio=False)
@@ -831,23 +834,23 @@ output_video = clip1.fl_image(main_pipeline)
 # video_clip.audio.reader.close_proc()
 ```
 
-    [MoviePy] >>>> Building video challenge_video_out.mp4
-    [MoviePy] Writing video challenge_video_out.mp4
+    [MoviePy] >>>> Building video project_video_out.mp4
+    [MoviePy] Writing video project_video_out.mp4
     
 
-    100%|████████████████████████████████████████████████████████████████████████████████| 485/485 [01:43<00:00,  4.74it/s]
+    100%|█████████████████████████████████████████████████████████████████████████████▉| 1260/1261 [04:49<00:00,  4.19it/s]
     
 
     [MoviePy] Done.
-    [MoviePy] >>>> Video ready: challenge_video_out.mp4 
+    [MoviePy] >>>> Video ready: project_video_out.mp4 
     
-    Wall time: 1min 44s
+    Wall time: 4min 50s
     
 
 ## Model Performance
 As we can see, our pipeline appears to handle lane lines quite well. (Note: Click on the image to watch the full video on youtube).
 
-<a href='https://www.youtube.com/watch?v=svgmZxfS5C8'>![Test](project_video_out.gif)</a>
+<a href='https://www.youtube.com/watch?v=W-C7Ia23fD8'>![Test](project_video_out.gif)</a>
 
 ## Future Work
 1. The model performed just OK on the challenge video but poorly on the harder challenge due to vastly different lighting and road conditions. I'd like to revist them when time permits.
