@@ -94,7 +94,7 @@ chess_images, ret, mtx, dist, rvecs, tvecs = camera_calibration(chess_image_path
     
 
 
-![png](media/output_6_1.png)
+![png](output_6_1.png)
 
 
 ## Undistorting images
@@ -116,7 +116,7 @@ plt.show()
 ```
 
 
-![png](media/output_8_0.png)
+![png](output_8_0.png)
 
 
 
@@ -135,7 +135,7 @@ plt.show()
 ```
 
 
-![png](media/output_9_0.png)
+![png](output_9_0.png)
 
 
 ## Threshold function that returns an image filtered on gradient and color parameters
@@ -238,7 +238,7 @@ for ax_i in ax:
 ```
 
 
-![png](media/output_13_0.png)
+![png](output_13_0.png)
 
 
 
@@ -259,7 +259,7 @@ plt.axis('off')
 
 
 
-![png](media/output_14_1.png)
+![png](output_14_1.png)
 
 
 ## Plot source points on the image
@@ -289,7 +289,7 @@ for i,label in enumerate(labels):
 ```
 
 
-![png](media/output_16_0.png)
+![png](output_16_0.png)
 
 
 ## Apply birds-eye view perspective transform
@@ -356,7 +356,7 @@ plt.imshow(final_image_warped,cmap='gray')
 
 
 
-![png](media/output_18_1.png)
+![png](output_18_1.png)
 
 
 ## Mask region of interest
@@ -388,7 +388,7 @@ plt.imshow(final_image_warped_masked,cmap='gray')
 
 
 
-![png](media/output_20_1.png)
+![png](output_20_1.png)
 
 
 ## Initial lane line detection
@@ -423,14 +423,14 @@ initial_left_lane_x, initial_right_lane_x = initial_lane_detection(final_image_w
     
 
 
-![png](media/output_22_1.png)
+![png](output_22_1.png)
 
 
 ## Continuous lane line detection
 Now that we know the general region of where the lanes are located, we can use this information to scan the location of the new lanes at the upcoming windows.
 
 Using the collected (and imputed) lane line locations, we fit a line and retrieve the best fit second order polynomial values. Second order polynomial function:
-![png](media/formula_second_order_poly.png)
+![Second Order Polynomial](./media/formula_second_order_poly.png)
 
 
 ```python
@@ -550,26 +550,22 @@ img_out,left_lane_fit,right_lane_fit,left_lane_fit_x,right_lane_fit_x,left_lane_
 ```
 
 
-![png](media/output_24_0.png)
+![png](output_24_0.png)
 
 
 
-![png](media/output_24_1.png)
+![png](output_24_1.png)
 
 
 ## Calculating radius of curvature
 1. In order to calculate the radius of curvature, we first need to find the 1st and 2nd derivatives of our second order polynomial function:
-
 ![png](media/formula_second_order_poly.PNG)
-
 ![png](media/formula_12derivatives.PNG)
 
 2. We convert our pixel scale into real world coordinates using an appropriate meter to pixel ratio:
-
 ![png](media/formula_pixel_conversion.png)
 
 3. After calculating their respective derivatives, we estimate the radius of curvature for both left/right lane lines using our curvature formula:
-
 ![png](media/formula_rcurve1.PNG)
 
 
@@ -678,7 +674,7 @@ plt.axis('off')
 
 
 
-![png](media/output_29_1.png)
+![png](output_29_1.png)
 
 
 ## Define line class and processing pipeline
@@ -863,7 +859,7 @@ output_video = clip1.fl_image(main_pipeline)
 ## Model Performance
 As we can see, our pipeline appears to handle lane lines quite well. (Note: Click on the image to watch the full video on youtube).
 
-<a href='https://www.youtube.com/watch?v=W-C7Ia23fD8'>![Test](project_video_out.gif)</a>
+<a href='https://www.youtube.com/watch?v=MsPSgDkyGIk'>![Test](project_video_out.gif)</a>
 
 ## Future Work
 1. The model performed just OK on the challenge video but poorly on the harder challenge due to vastly different lighting and road conditions. I'd like to revist them when time permits.
