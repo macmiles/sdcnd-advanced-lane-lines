@@ -858,6 +858,7 @@ output_video = clip1.fl_image(main_pipeline)
 
 ## Model Performance
 As we can see, our pipeline appears to handle lane lines quite well.
+
 <a href='https://www.youtube.com/watch?v=MsPSgDkyGIk'>![Test](project_video_out.gif)</a>
 
 ## Future Work
