@@ -857,9 +857,7 @@ output_video = clip1.fl_image(main_pipeline)
     
 
 ## Model Performance
-As we can see, our pipeline appears to handle lane lines quite well. (Note: Click on the image to watch the full video on youtube).
-
-<a href='https://www.youtube.com/watch?v=MsPSgDkyGIk'>![Test](project_video_out.gif)</a>
+As we can see, our pipeline appears to handle lane lines quite well.
 
 ## Future Work
 1. The model performed well on the challenge video but poorly on the harder challenge due to vastly different lighting and road conditions. I'd like to revist them when time permits.
