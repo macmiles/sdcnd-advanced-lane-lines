@@ -862,7 +862,7 @@ As we can see, our pipeline appears to handle lane lines quite well. (Note: Clic
 <a href='https://www.youtube.com/watch?v=MsPSgDkyGIk'>![Test](project_video_out.gif)</a>
 
 ## Future Work
-1. The model performed just OK on the challenge video but poorly on the harder challenge due to vastly different lighting and road conditions. I'd like to revist them when time permits.
+1. The model performed well on the challenge video but poorly on the harder challenge due to vastly different lighting and road conditions. I'd like to revist them when time permits.
 2. I'd like to incorporate more redundancy checks in the model. For example, in the event that there's shadows in an image that disrupt the identification of the left lane line while the right lane line remains unaffected, I'd like the model to piggy-back on the right lane line when estimating the curvature of the left lane line.
 3. It might be interesting to see how well this model can perform on other roads and conditions. 
 4. Developing a smoothing system that uses recent historical lane line data would further enhance the models ability to detect lane lines and mitigate the outliers that may arise in some road conditions.
